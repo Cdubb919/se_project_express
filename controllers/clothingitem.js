@@ -8,12 +8,16 @@ const createItem = (req, res) => {
   ClothingItem.create({ name, weather, imageURL })
     .then((item) => {
       console.log(item);
-      res.send({ data: item });
+      res.status(201).send({ data: item });
     })
     .catch((e) => {
-      res.status(500).send({ message: "Error from createItem", e });
+      if (e.name === 'ValidationError') {
+        return res.status(400).send({ message: "Invalid item data", error: e.message });
+      }
+      res.status(500).send({ message: "Error from createItem", error: e.message });
     });
 };
+
 
 const getItems = (req, res) => {
   ClothingItem.find({}).then((items) => res.status(200).send(items))
@@ -26,20 +30,41 @@ const updateItem = (req, res) => {
   const { itemId } = req.params;
   const { imageURL } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } }).orFail().then((ite => res.status(200).send({ data: item })))
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $set: { imageURL } },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
-      res.status(500).send({ message: "Error from updateItem", e })
-    })
-}
+      if (e.name === 'DocumentNotFoundError') {
+        return res.status(404).send({ message: "Item not found" });
+      } else if (e.name === 'CastError') {
+        return res.status(400).send({ message: "Invalid item ID format" });
+      } else if (e.name === 'ValidationError') {
+        return res.status(400).send({ message: "Invalid update data" });
+      }
+      res.status(500).send({ message: "Error from updateItem", error: e.message });
+    });
+};
+
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId).orFail().then((Item) => res.status(204).send({}))
+  ClothingItem.findByIdAndDelete(itemId)
+    .orFail()
+    .then(() => res.status(204).send())
     .catch((e) => {
-      res.status(500).send({ message: "Error from deleteItem", e })
-    })
-}
+      if (e.name === 'DocumentNotFoundError') {
+        return res.status(404).send({ message: "Item not found" });
+      } else if (e.name === 'CastError') {
+        return res.status(400).send({ message: "Invalid item ID format" });
+      }
+      res.status(500).send({ message: "Error from deleteItem", error: e.message });
+    });
+};
 
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
