@@ -1,13 +1,12 @@
 const ClothingItem = require("../models/clothingitem");
 
+const { CREATED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = require('../utils/errors');
+
 const createItem = (req, res) => {
-  console.log(req.body);
 
   const { name, weather, imageUrl } = req.body;
 
-  const { CREATED, BAD_REQUEST, INTERNAL_SERVER_ERROR } = require('../utils/errors');
-
-  ClothingItem.create({ name, weather, imageURL })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       res.status(CREATED).send({ data: item });
     })
@@ -15,16 +14,14 @@ const createItem = (req, res) => {
       if (e.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({ message: "Invalid item data" });
       }
-      res.status(INTERNAL_SERVER_ERROR).send({ message: "An unexpected error occurred while creating the item." });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "An unexpected error occurred while creating the item." });
     });
 };
 
 
 const getItems = (req, res) => {
   ClothingItem.find({}).then((items) => res.status(OK).send(items))
-    .catch((e) => {
-      res.status(INTERNAL_SERVER_ERROR).send({ message: "Error from getItems", e })
-    })
+    .catch((e) => res.status(INTERNAL_SERVER_ERROR).send({ message: "Error from getItems", e }))
 }
 
 
@@ -37,10 +34,10 @@ const deleteItem = (req, res) => {
     .catch((e) => {
       if (e.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
-      } else if (e.name === 'CastError') {
+      } if (e.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
       }
-      res.status(INTERNAL_SERVER_ERROR).send({ message: "Error from deleteItem", error: e.message });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "Error from deleteItem", error: e.message });
     });
 };
 
@@ -56,7 +53,7 @@ const likeItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
-      } else if (err.name === "CastError") {
+      } if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid item ID format." });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
@@ -75,7 +72,7 @@ const dislikeItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: "Item not found." });
-      } else if (err.name === "CastError") {
+      } if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid item ID format." });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
