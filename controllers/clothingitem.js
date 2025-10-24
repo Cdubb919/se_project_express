@@ -27,19 +27,29 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const userId = req.user._id;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
-    .then(() => res.send({ message: "Item deleted" }))
+    .then((item) => {
+      if (item.owner.toString() !== userId) {
+        return res.status(403).send({ message: "You are not authorized to delete this item." });
+      }
+
+      return item.deleteOne()
+        .then(() => res.send({ message: "Item deleted" }));
+    })
     .catch((e) => {
       if (e.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
-      } if (e.name === 'CastError') {
+      }
+      if (e.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: "Error from deleteItem", error: e.message });
     });
 };
+
 
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
