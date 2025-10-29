@@ -10,6 +10,7 @@ router.post("/signup", createUser);
 router.post("/signin", login);
 
 const { getItems } = require("../controllers/clothingitem");
+
 router.get("/items", getItems);
 
 router.use(auth);
