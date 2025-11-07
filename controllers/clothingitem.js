@@ -29,6 +29,24 @@ const getItems = (req, res) => {
     });
 };
 
+const getItemById = (req, res) => {
+  const { id } = req.params;
+
+  ClothingItem.findById(id)
+    .then((item) => {
+      if (!item) {
+        return res.status(NOT_FOUND).send({ message: "Item not found" });
+      }
+      return res.status(OK).send(item);
+    })
+    .catch((e) => {
+      console.error("Error in getItemById:", e);
+      if (e.name === 'CastError') {
+        return res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
+      }
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: "Internal server error" });
+    });
+};
 
 
 const deleteItem = (req, res) => {
@@ -107,6 +125,7 @@ const dislikeItem = (req, res) => {
 module.exports = {
   createItem,
   getItems,
+  getItemById,
   deleteItem,
   likeItem,
   dislikeItem,
