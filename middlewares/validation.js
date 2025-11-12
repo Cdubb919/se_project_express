@@ -18,7 +18,7 @@ module.exports.validateCardBody = celebrate({
     imageUrl: Joi.string().required().custom(validateURL).messages({
       'string.empty': 'The "imageUrl" field must be filled in',
       'string.uri': 'The "imageUrl" field must be a valid url',
-    }),
+    }),weather: Joi.string().required().valid("hot", "cold", "warm")
   }),
 });
 
@@ -42,6 +42,19 @@ module.exports.validateUserBody = celebrate({
   }),
 });
 
+module.exports.validateUserUpdate = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).messages({
+      'string.min': 'The minimum length of the "name" field is 2',
+      'string.max': 'The maximum length of the "name" field is 30',
+    }),
+    avatar: Joi.string().required().custom(validateURL).messages({
+      'string.empty': 'The "avatar" field must be filled in',
+      'string.uri': 'The "avatar" field must be a valid url',
+    }),
+  }),
+});
+
 module.exports.validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
@@ -56,7 +69,7 @@ module.exports.validateLogin = celebrate({
 
 module.exports.validateId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().hex().length(24).required().messages({
+    itemId: Joi.string().hex().length(24).required().messages({
       'string.length': 'ID must be 24 characters long',
       'string.hex': 'ID must be a hexadecimal string',
       'any.required': 'ID is required',
