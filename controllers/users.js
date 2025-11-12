@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const {
   OK,
@@ -20,11 +21,12 @@ const getUsers = (req, res) => {
     });
 };
 
-
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  return User.create({ name, avatar, email, password })
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({ name, avatar, email, password: hash }))
     .then((user) => {
       const userData = user.toObject();
       delete userData.password;
@@ -122,7 +124,3 @@ module.exports = {
   updateCurrentUser,
   login,
 };
-
-
-
-
