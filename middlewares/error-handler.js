@@ -5,9 +5,12 @@ const errorHandler = (err, req, res, next) => {
 
   const statusCode = err.statusCode || INTERNAL_SERVER_ERROR;
 
-  const message = err.message || "An unexpected error occurred on the server";
-
-  res.status(statusCode).send({ message });
+  res.status(statusCode).send({
+    message:
+      statusCode === INTERNAL_SERVER_ERROR
+        ? "An error occurred on the server"
+        : err.message,
+  });
 };
 
 module.exports = errorHandler;
