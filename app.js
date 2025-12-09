@@ -10,8 +10,14 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
+
+app.use(cors({
+  origin: ['https://wtwrcdubb.localghost.org', 'http://localhost:3000'],
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 
 app.use(requestLogger);
 
