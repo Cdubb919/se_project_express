@@ -9,10 +9,18 @@ const userSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30,
   },
+
   avatar: {
     type: String,
     required: true,
+    validate: {
+      validator(v) {
+        return validator.isURL(v);
+      },
+      message: 'Invalid URL format',
+    },
   },
+
   email: {
     type: String,
     required: true,
@@ -24,6 +32,7 @@ const userSchema = new mongoose.Schema({
       message: 'Invalid email format',
     },
   },
+
   password: {
     type: String,
     required: true,
@@ -39,14 +48,13 @@ userSchema.statics.findUserByCredentials = function (email, password) {
         return Promise.reject(new Error('Incorrect email or password'));
       }
 
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            return Promise.reject(new Error('Incorrect email or password'));
-          }
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(new Error('Incorrect email or password'));
+        }
 
-          return user;
-        });
+        return user;
+      });
     });
 };
 

@@ -3,7 +3,7 @@ const {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} = require("../utils/customErrors");
+} = require("../utils/errors.js");
 
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;

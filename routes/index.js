@@ -10,11 +10,7 @@ const auth = require('../middlewares/auth');
 const userRouter = require('./users');
 const clothingItemRouter = require('./clothingitem');
 
-const {
-  createUser,
-  login,
-} = require('../controllers/users');
-
+const { createUser, login } = require('../controllers/users');
 const { getItems, getItemById } = require('../controllers/clothingitem');
 
 const router = express.Router();
@@ -23,7 +19,8 @@ router.post('/signup', validateUserBody, createUser);
 router.post('/signin', validateLogin, login);
 
 router.get('/items', getItems);
-router.get('/items/:id', validateId, getItemById);
+
+router.get('/items/:itemId', validateId, getItemById);
 
 router.use(auth);
 
