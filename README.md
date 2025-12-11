@@ -8,7 +8,12 @@ The back-end project is focused on creating a server for the WTWR application. Y
 ### Testing
 Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
 
-
 #### Project 13 Video -- https://drive.google.com/file/d/17x-2rC8aQA6YkDg4npO_XjEp-Mq_nagP/view?usp=sharing
 
 ##### Project 15 Video -- https://drive.google.com/file/d/14EumXqahUqVtvz0FtczIKAeFMyQxAjrm/view?usp=sharing
+
+###### Deployed Project Link
+https://wtwrcdubb.localghost.org/
+
+####### Frontend repo Link
+https://github.com/Cdubb919/se_project_react.git

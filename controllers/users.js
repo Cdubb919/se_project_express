@@ -2,20 +2,21 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
-const { OK, CREATED } = require('../utils/errors');
-const { JWT_SECRET } = require('../utils/config');
-
 const {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-  ConflictError,
-} = require('../utils/customErrors');
+  OK,
+  CREATED,
+  BAD_REQUEST,
+  UNAUTHORIZED_ERROR_CODE,
+  NOT_FOUND_ERROR_CODE,
+  CONFLICT_ERROR_CODE,
+} = require('../utils/errors');
+
+const { JWT_SECRET } = require('../utils/config');
 
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(OK).send(users))
-    .catch(next); 
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
@@ -31,11 +32,17 @@ const createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return next(new ConflictError('Email already exists.'));
+        return next({
+          statusCode: CONFLICT_ERROR_CODE,
+          message: 'Email already exists.',
+        });
       }
 
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Invalid user data.'));
+        return next({
+          statusCode: BAD_REQUEST,
+          message: 'Invalid user data.',
+        });
       }
 
       return next(err);
@@ -46,11 +53,17 @@ const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
 
   User.findById(userId)
-    .orFail(() => new NotFoundError('User not found.'))
+    .orFail(() => ({
+      statusCode: NOT_FOUND_ERROR_CODE,
+      message: 'User not found.',
+    }))
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestError('Invalid user ID format.'));
+        return next({
+          statusCode: BAD_REQUEST,
+          message: 'Invalid user ID format.',
+        });
       }
 
       return next(err);
@@ -66,15 +79,24 @@ const updateCurrentUser = (req, res, next) => {
     { name, avatar },
     { new: true, runValidators: true }
   )
-    .orFail(() => new NotFoundError('User not found.'))
+    .orFail(() => ({
+      statusCode: NOT_FOUND_ERROR_CODE,
+      message: 'User not found.',
+    }))
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Invalid user data.'));
+        return next({
+          statusCode: BAD_REQUEST,
+          message: 'Invalid user data.',
+        });
       }
 
       if (err.name === 'CastError') {
-        return next(new BadRequestError('Invalid user ID format.'));
+        return next({
+          statusCode: BAD_REQUEST,
+          message: 'Invalid user ID format.',
+        });
       }
 
       return next(err);
@@ -85,17 +107,25 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new BadRequestError('Email and password are required.'));
+    return next({
+      statusCode: BAD_REQUEST,
+      message: 'Email and password are required.',
+    });
   }
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: '7d',
+      });
       res.status(OK).send({ token });
     })
     .catch((err) => {
       if (err.message === 'Incorrect email or password') {
-        return next(new UnauthorizedError('Incorrect email or password.'));
+        return next({
+          statusCode: UNAUTHORIZED_ERROR_CODE,
+          message: 'Incorrect email or password.',
+        });
       }
 
       return next(err);
