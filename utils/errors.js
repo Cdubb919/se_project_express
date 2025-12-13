@@ -1,21 +1,42 @@
-const OK = 200;
-const CREATED = 201;
+class BadRequestError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 400;
+  }
+}
 
-const BAD_REQUEST = 400;
+class UnauthorizedError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 401;
+  }
+}
 
-const UNAUTHORIZED_ERROR_CODE = 401;
-const FORBIDDEN_ERROR_CODE = 403;
-const NOT_FOUND_ERROR_CODE = 404;
-const CONFLICT_ERROR_CODE = 409;
-const INTERNAL_SERVER_ERROR = 500;
+class ForbiddenError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 403;
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 404;
+  }
+}
+
+class ConflictError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 409;
+  }
+}
 
 module.exports = {
-  OK,
-  CREATED,
-  BAD_REQUEST,
-  UNAUTHORIZED_ERROR_CODE,
-  FORBIDDEN_ERROR_CODE,
-  NOT_FOUND_ERROR_CODE,
-  CONFLICT_ERROR_CODE,
-  INTERNAL_SERVER_ERROR,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
 };

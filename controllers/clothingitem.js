@@ -9,7 +9,7 @@ const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
-    .then((item) => res.status(201).send({ data: item }))
+    .then((item) => res.status(201).send(item)) 
     .catch((err) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid item data"));
@@ -25,7 +25,7 @@ const getItems = (req, res, next) => {
 };
 
 const getItemById = (req, res, next) => {
-  ClothingItem.findById(req.params.id)
+  ClothingItem.findById(req.params.itemId)
     .orFail(() => new NotFoundError("Item not found"))
     .then((item) => res.send(item))
     .catch((err) => {
