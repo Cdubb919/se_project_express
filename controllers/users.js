@@ -77,6 +77,8 @@ const updateCurrentUser = (req, res, next) => {
 
       return next(err);
     });
+
+  return null;
 };
 
 const login = (req, res, next) => {
@@ -93,11 +95,13 @@ const login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: '7d',
       });
-      res.send({ token });
+      return res.send({ token });
     })
     .catch(() =>
       next(new UnauthorizedError('Incorrect email or password.'))
     );
+
+  return null;
 };
 
 module.exports = {

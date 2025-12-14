@@ -3,13 +3,26 @@ const {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} = require("../utils/errors.js");
+} = require("../utils/errors");
 
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
-    .then((item) => res.status(201).send(item)) 
+  if (!req.user || !req.user._id) {
+    return next(new ForbiddenError("Authorization required"));
+  }
+
+  if (!name || !weather || !imageUrl) {
+    return next(new BadRequestError("Missing required fields"));
+  }
+
+  ClothingItem.create({
+    name,
+    weather,
+    imageUrl,
+    owner: req.user._id,
+  })
+    .then((item) => res.status(201).send(item))
     .catch((err) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid item data"));

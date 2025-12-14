@@ -2,7 +2,6 @@ const express = require('express');
 const {
   validateUserBody,
   validateLogin,
-  validateCardBody,
   validateId,
 } = require('../middlewares/validation');
 

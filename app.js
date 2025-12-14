@@ -7,7 +7,6 @@ const mainRouter = require('./routes/index');
 const errorHandler = require('./middlewares/error-handler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-
 const app = express();
 
 app.use(express.json());
@@ -21,7 +20,7 @@ app.use(cors({
 
 app.use(requestLogger);
 
-app.get('/crash-test', (_req, _res) => {
+app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Server will crash now');
   }, 0);
@@ -30,9 +29,7 @@ app.get('/crash-test', (_req, _res) => {
 app.use('/', mainRouter);
 
 app.use(errorLogger);
-
 app.use(errors());
-
 app.use(errorHandler);
 
 const PORT = 3001;

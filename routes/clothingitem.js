@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 
 const {
@@ -7,7 +8,7 @@ const {
   deleteItem,
   likeItem,
   dislikeItem,
-} = require('../controllers/clothingitem'); 
+} = require('../controllers/clothingitem');
 
 const { validateCardBody, validateId } = require('../middlewares/validation');
 
